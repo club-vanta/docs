@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+site_name: Alter Tracker - Documentacion
+site_description: Documentacion de logica de negocio del sistema de control de puerta de Alter
+site_author: Club Vanta
+
+theme:
+  name: material
+  language: es
+  palette:
+    scheme: slate
+    primary: deep purple
+    accent: purple
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Inicio: index.md
+  - Guias:
+    - Registrar usuarios: guides/registrar-usuarios.md
+    - Crear una organizacion: guides/organizations.md
+    - Cargar un evento: guides/meetups.md
+    - Recuperar contrasena: guides/password-recovery.md
+  - Roles y permisos: roles-and-access.md
+  - Referencia:
+    - Mazmo: business-logic/mazmo.md
+    - Guests: business-logic/guests.md
+    - Meetups: business-logic/meetups.md
+    - Check-in: business-logic/checkin.md
+    - Bans: business-logic/bans.md
+    - Sync desde Mazmo: business-logic/sync.md
+    - Audit trail: audit-trail.md
+  - Referencia Tecnica:
+    - Inicio: technical/index.md
+    - Esquema de base de datos: technical/database-schema.md
+    - API Reference: technical/api-reference.md
+    - Autenticacion: technical/auth.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
