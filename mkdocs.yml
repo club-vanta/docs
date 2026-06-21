@@ -39,6 +39,7 @@ nav:
     - Esquema de base de datos: technical/database-schema.md
     - API Reference: technical/api-reference.md
     - Autenticacion: technical/auth.md
+    - Promover un Site Admin: technical/promover-site-admin.md
 
 markdown_extensions:
   - admonition
