@@ -2,7 +2,7 @@
 
 Una **organizacion** es el espacio donde viven tus meetups, tus guests y tus bans. El acceso al sistema es siempre a traves de una org: los usuarios solo pueden hacer cosas dentro de las orgs a las que pertenecen.
 
-Esta guia es para quienes administran el sistema a nivel global (rol **Site Admin**). Si sos staff de una org ya existente, no necesitas hacer esto - alguien ya lo hizo por vos.
+Crear organizaciones y editar su nombre o slug es exclusivo del rol **Site Admin**. La gestion de miembros (agregar, cambiar rol, remover) puede hacerla tanto un **Site Admin** como un **Admin de organizacion**.
 
 ---
 
@@ -15,8 +15,8 @@ Esta guia es para quienes administran el sistema a nivel global (rol **Site Admi
    - **Slug**: una identificacion corta para URLs, solo letras minusculas y guiones (ej: `alter-bsas`)
 4. Confirma la creacion.
 
-!!! info "El slug no cambia"
-    El slug se usa en links internos y debe ser unico en todo el sistema. Elegilo con cuidado porque no se puede editar despues.
+!!! info "El slug debe ser unico"
+    El slug se usa en links internos y debe ser unico en todo el sistema. Un Site Admin puede editarlo despues desde la configuracion de la org, pero hacerlo puede romper links existentes.
 
 ---
 

@@ -21,17 +21,26 @@ Todos los endpoints agrupados por dominio, con el rol minimo requerido para cada
 
 ## Organizaciones
 
-La gestion de organizaciones es exclusiva de SITE_ADMINs. Leer una org especifica esta disponible para cualquier miembro de esa org.
+Crear y editar organizaciones es exclusivo de SITE_ADMINs. La gestion de miembros esta disponible para ADMIN de org y SITE_ADMIN. Leer una org especifica esta disponible para cualquier miembro de esa org.
 
 | Metodo | Path | Rol requerido | Descripcion |
 |--------|------|--------------|-------------|
 | GET | /organizations/ | SITE_ADMIN | Listar todas las organizaciones |
 | POST | /organizations/ | SITE_ADMIN | Crear una organizacion |
 | GET | /organizations/{org_id} | Miembro de la org o SITE_ADMIN | Ver detalles de la org |
-| GET | /organizations/{org_id}/members | SITE_ADMIN | Listar miembros de la org con sus roles |
-| POST | /organizations/{org_id}/members/{user_id} | SITE_ADMIN | Agregar un usuario a la org con un rol |
-| PATCH | /organizations/{org_id}/members/{user_id} | SITE_ADMIN | Cambiar el rol de un miembro (STAFF <-> ADMIN) |
-| DELETE | /organizations/{org_id}/members/{user_id} | SITE_ADMIN | Remover un usuario de la org |
+| PATCH | /organizations/{org_id} | SITE_ADMIN | Editar nombre o slug de la org |
+| GET | /organizations/{org_id}/members | ADMIN de org o SITE_ADMIN | Listar miembros de la org con sus roles |
+| POST | /organizations/{org_id}/members/{user_id} | ADMIN de org o SITE_ADMIN | Agregar un usuario a la org con un rol |
+| PATCH | /organizations/{org_id}/members/{user_id} | ADMIN de org o SITE_ADMIN | Cambiar el rol de un miembro (STAFF <-> ADMIN) |
+| DELETE | /organizations/{org_id}/members/{user_id} | ADMIN de org o SITE_ADMIN | Remover un usuario de la org |
+
+---
+
+## Usuarios
+
+| Metodo | Path | Rol requerido | Descripcion |
+|--------|------|--------------|-------------|
+| GET | /users/ | Usuario aprobado | Buscar usuarios por username (query param `q`) |
 
 ---
 

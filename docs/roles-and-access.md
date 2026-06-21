@@ -60,6 +60,7 @@ Acceso completo dentro de la org. Ademas de todo lo que puede hacer Staff:
 - Banear y desbanear guests en la org (con razon obligatoria)
 - Finalizar y des-finalizar meetups
 - Ver el audit log completo de la org (todos los eventos, todos los actores)
+- Gestionar miembros de la org (agregar, cambiar rol, remover)
 
 ---
 
@@ -80,7 +81,7 @@ Acceso completo dentro de la org. Ademas de todo lo que puede hacer Staff:
 | **Desbanear guest** | No | Si | Si |
 | **Finalizar meetup** | No | Si | Si |
 | **Ver audit log completo de la org** | No | Si | Si |
-| **Gestionar miembros de la org** | No | No | Si |
+| **Gestionar miembros de la org** | No | Si | Si |
 | **Crear organizaciones** | No | No | Si |
 | **Aprobar/gestionar cuentas de staff** | No | No | Si |
 
