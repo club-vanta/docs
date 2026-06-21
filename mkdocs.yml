@@ -40,6 +40,7 @@ nav:
     - API Reference: technical/api-reference.md
     - Autenticacion: technical/auth.md
     - Promover un Site Admin: technical/promover-site-admin.md
+    - Restaurar base de datos: technical/database-restore.md
 
 markdown_extensions:
   - admonition
