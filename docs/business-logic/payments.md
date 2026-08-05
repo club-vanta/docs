@@ -8,7 +8,7 @@ El pago de la entrada lo maneja el organizador del evento por fuera del sistema 
 
 ## `requires_payment` en el meetup
 
-Un meetup se marca como pago con el campo `requires_payment`. Se define al crear el meetup y no se puede editar despues -- si un evento gratuito pasa a ser pago, hay que crear un meetup nuevo.
+Un meetup se marca como pago con el campo `requires_payment`. Se define al crear el meetup, y se puede cambiar despues en cualquier momento (ver [Cambiar el tipo de evento](#cambiar-el-tipo-de-evento-despues-de-creado) mas abajo).
 
 Si `requires_payment` es `false` (el default), el sistema funciona exactamente igual que antes: el pago nunca se verifica.
 
@@ -45,3 +45,20 @@ Esto aplica tambien a walk-ins: un guest agregado como walk-in a un evento pago 
 ## Lo que el sync nunca toca
 
 Igual que los campos de check-in, el sync desde Mazmo nunca modifica `has_paid`, `paid_at`, ni quien lo marco. El pago es exclusivamente manual.
+
+## Cambiar el tipo de evento despues de creado
+
+Un evento puede pasar de gratis a pago (o al reves) en cualquier momento antes de finalizarse. Solo admins de org (y SITE_ADMINs) pueden hacerlo -- el staff no.
+
+- **Habilitar pago**: marca `requires_payment = true`. A partir de ese momento, cualquier guest sin `has_paid` queda bloqueado en el check-in.
+- **Deshabilitar pago**: marca `requires_payment = false`. El check-in deja de exigir el pago.
+
+No hace falta razon para ninguna de las dos -- es un toggle administrativo, igual que finalizar/des-finalizar un meetup, no la correccion de un error puntual. Cada direccion genera su propia entrada en el audit log (`PAYMENT_REQUIREMENT_ENABLED` / `PAYMENT_REQUIREMENT_DISABLED`).
+
+!!! note "El cambio no es retroactivo"
+    Nada de esto toca los RSVPs existentes:
+
+    - Si un evento pasa de gratis a pago, los guests que ya hicieron check-in se quedan como estan (ya entraron). Los que todavia no entraron ahora necesitan que un admin les marque el pago.
+    - Si un evento pasa de pago a gratis, los `has_paid` ya registrados no se borran -- quedan inertes, y si el pago se vuelve a habilitar mas adelante siguen siendo validos.
+
+Igual que el resto de las acciones administrativas sobre un meetup, esto esta bloqueado si el meetup ya esta finalizado.

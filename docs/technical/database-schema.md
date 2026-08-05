@@ -191,7 +191,7 @@ Eventos trackeados por el sistema. Cada meetup pertenece a una org y esta vincul
 | date | timestamptz | NOT NULL | Obtenido de Mazmo al crear |
 | is_finalized | boolean | NOT NULL, default false | Bloquea check-ins y syncs cuando es true |
 | finalized_at | timestamptz | nullable | Seteado al finalizar |
-| requires_payment | boolean | NOT NULL, default false | Si true, el check-in exige has_paid=true en el RSVP. Se define al crear, no editable despues |
+| requires_payment | boolean | NOT NULL, default false | Si true, el check-in exige has_paid=true en el RSVP. Se define al crear, editable despues via enable-payment/disable-payment |
 
 ---
 
@@ -253,7 +253,7 @@ Audit log. Una fila por accion auditable. Las filas nunca se modifican ni elimin
 | meetup_id | uuid | FK -> meetups.id, nullable, indexed | |
 | reason | varchar(500) | nullable | Presente para UNDO_CHECK_IN y BAN |
 
-**Valores de EventType:** `CHECK_IN`, `UNDO_CHECK_IN`, `BAN`, `UNBAN`, `MEETUP_FINALIZED`, `MEETUP_UNFINALIZED`, `WALKIN`, `GUEST_CREATED`, `PAYMENT_RECORDED`, `PAYMENT_REVOKED`
+**Valores de EventType:** `CHECK_IN`, `UNDO_CHECK_IN`, `BAN`, `UNBAN`, `MEETUP_FINALIZED`, `MEETUP_UNFINALIZED`, `WALKIN`, `GUEST_CREATED`, `PAYMENT_RECORDED`, `PAYMENT_REVOKED`, `PAYMENT_REQUIREMENT_ENABLED`, `PAYMENT_REQUIREMENT_DISABLED`
 
 Cada entrada del audit log se escribe en la misma transaccion de base de datos que la accion que registra. Si la accion se revierte, la entrada del log se revierte con ella.
 
