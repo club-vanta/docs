@@ -50,6 +50,7 @@ El rol base para quienes trabajan en la puerta durante un evento.
 - Banear o desbanear guests
 - Finalizar o re-abrir meetups
 - Ver el audit log completo de la org
+- Marcar o deshacer el pago de un guest en eventos pagos
 
 ### Admin de organizacion
 
@@ -59,6 +60,7 @@ Acceso completo dentro de la org. Ademas de todo lo que puede hacer Staff:
 
 - Banear y desbanear guests en la org (con razon obligatoria)
 - Finalizar y des-finalizar meetups
+- Marcar y deshacer el pago de un guest en eventos pagos (deshacer requiere razon)
 - Ver el audit log completo de la org (todos los eventos, todos los actores)
 - Gestionar miembros de la org (agregar, cambiar rol, remover)
 
@@ -80,6 +82,7 @@ Acceso completo dentro de la org. Ademas de todo lo que puede hacer Staff:
 | **Banear guest** | No | Si | Si |
 | **Desbanear guest** | No | Si | Si |
 | **Finalizar meetup** | No | Si | Si |
+| **Marcar/deshacer pago de guest** | No | Si | Si |
 | **Ver audit log completo de la org** | No | Si | Si |
 | **Gestionar miembros de la org** | No | Si | Si |
 | **Crear organizaciones** | No | No | Si |

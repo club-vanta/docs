@@ -31,6 +31,7 @@ nav:
     - Guests: business-logic/guests.md
     - Meetups: business-logic/meetups.md
     - Check-in: business-logic/checkin.md
+    - Pagos: business-logic/payments.md
     - Bans: business-logic/bans.md
     - Sync desde Mazmo: business-logic/sync.md
     - Audit trail: audit-trail.md

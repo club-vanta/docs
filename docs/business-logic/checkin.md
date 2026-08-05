@@ -12,6 +12,7 @@ El check-in es la operacion central del sistema: registrar que un guest llego al
    - El guest no esta ya checked in
    - El guest no esta baneado
    - El meetup no esta finalizado
+   - Si el evento es pago (`requires_payment`), que el guest ya haya pagado
 5. Si todo esta bien, el sistema registra el check-in:
    - `has_arrived = true`
    - `arrival_time` se setea automaticamente con la hora actual
@@ -59,6 +60,7 @@ Al deshacer:
 | Guest ya checked in | Error 409 - hay que deshacer primero |
 | Meetup finalizado | Error 409 - el evento ya cerro |
 | Guest baneado | Advertencia - pide confirmacion al staff |
+| Evento pago y guest no pago | Error 409 - bloqueo real, no hay opcion de "igual dejarlo pasar". Ver [Pagos](payments.md) |
 
 ## Que registra el sistema
 

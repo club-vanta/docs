@@ -52,6 +52,7 @@ Mazmo es la plataforma donde la comunidad publica eventos y los integrantes conf
 - **[Guests](business-logic/guests.md)**: identidad de los asistentes, de donde vienen, como se gestionan
 - **[Meetups](business-logic/meetups.md)**: ciclo de vida de un evento desde creacion hasta finalizacion
 - **[Check-in](business-logic/checkin.md)**: el flujo de entrada en la puerta
+- **[Pagos](business-logic/payments.md)**: como funcionan los eventos pagos y el marcado manual de pago
 - **[Bans](business-logic/bans.md)**: como funciona el sistema de bans por organizacion
 - **[Sync desde Mazmo](business-logic/sync.md)**: como se traen los RSVPs de Mazmo al sistema
 - **[Audit trail](audit-trail.md)**: registro de todo lo que pasa en el sistema

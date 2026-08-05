@@ -8,6 +8,7 @@ Un meetup representa un evento de la comunidad que el sistema va a gestionar en 
 - **`mazmo_meetup_url`**: URL del evento en Mazmo (ej: `https://mazmo.net/alter-bsas/alter-12-123456`). Es unica por meetup.
 - **`date`**: fecha y hora del evento, obtenida automaticamente de Mazmo al crear el meetup.
 - **`is_finalized`**: si el evento ya cerro y no acepta mas cambios.
+- **`requires_payment`**: si el evento es pago. Se define al crear el meetup y no se puede editar despues. Ver [Pagos](payments.md).
 
 ## Ciclo de vida
 
