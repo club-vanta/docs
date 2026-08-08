@@ -1,6 +1,6 @@
 # Esquema de base de datos
 
-Esquema actual post-migraciones de organizaciones (0001-0015). Todas las tablas usan PostgreSQL.
+Esquema actual post-migraciones de organizaciones (0001-0016). Todas las tablas usan PostgreSQL.
 
 ## Diagrama de relaciones
 
@@ -38,9 +38,11 @@ erDiagram
         varchar role
     }
     guests {
-        int mazmo_user_id PK
-        varchar username
+        uuid id PK
+        int mazmo_user_id "nullable, unique"
+        varchar mazmo_handle "nullable"
         varchar displayname
+        varchar instagram_username "nullable"
     }
     meetups {
         uuid id PK
@@ -54,7 +56,7 @@ erDiagram
     }
     meetup_rsvps {
         uuid meetup_id PK_FK
-        int guest_id PK_FK
+        uuid guest_id PK_FK
         timestamptz rsvp_time
         bool cancelled_rsvp
         bool has_arrived
@@ -69,7 +71,7 @@ erDiagram
     organization_bans {
         int id PK
         uuid org_id FK
-        int guest_id FK
+        uuid guest_id FK
         int banned_by_id FK
         timestamptz banned_at
         varchar reason
@@ -80,7 +82,7 @@ erDiagram
         timestamptz timestamp
         uuid org_id FK
         int actor_id FK
-        int guest_id FK
+        uuid guest_id FK
         uuid meetup_id FK
         varchar reason
     }
@@ -166,13 +168,15 @@ Un usuario puede ser miembro de multiples orgs con roles distintos en cada una.
 
 ### `guests`
 
-Identidades obtenidas desde Mazmo. Los guests son globales -- no pertenecen a ninguna org especifica. La PK es el propio ID de Mazmo, lo que garantiza upserts idempotentes.
+Identidades de guests. Los guests son globales -- no pertenecen a ninguna org especifica. Una identidad puede o no estar vinculada a una cuenta de Mazmo: la PK es un `id` interno independiente de Mazmo, no `mazmo_user_id`.
 
 | Columna | Tipo | Constraints | Notas |
 |---------|------|-------------|-------|
-| mazmo_user_id | integer | PK | Asignado por Mazmo; nunca cambia |
-| username | varchar | NOT NULL, indexed | Handle de Mazmo |
+| id | uuid | PK | Generado al crear; nunca cambia, incluso a traves de vincular/desvincular Mazmo |
+| mazmo_user_id | integer | UNIQUE, nullable, indexed | Asignado por Mazmo; NULL si el guest no tiene cuenta de Mazmo vinculada |
+| mazmo_handle | varchar | nullable, indexed | Handle de Mazmo; NULL en la misma condicion que mazmo_user_id |
 | displayname | varchar | NOT NULL | Cambia frecuentemente |
+| instagram_username | varchar(64) | nullable | Independiente del vinculo con Mazmo |
 
 Los bans se almacenan en `organization_bans`, no en esta tabla. No existe campo `is_banned` en guests.
 
@@ -202,7 +206,7 @@ Asociacion entre un guest y un meetup, con datos de RSVP y check-in. PK compuest
 | Columna | Tipo | Constraints | Notas |
 |---------|------|-------------|-------|
 | meetup_id | uuid | PK + FK -> meetups.id | |
-| guest_id | integer | PK + FK -> guests.mazmo_user_id | |
+| guest_id | uuid | PK + FK -> guests.id | |
 | rsvp_time | timestamptz | NOT NULL | Cuando se registro el RSVP en Mazmo |
 | cancelled_rsvp | boolean | NOT NULL, default false | |
 | has_arrived | boolean | NOT NULL, default false, indexed | Solo modificado por el flujo de check-in; el sync nunca lo toca |
@@ -229,7 +233,7 @@ Bans activos de guests dentro de una organizacion. Una fila = un ban activo. Al 
 |---------|------|-------------|-------|
 | id | integer | PK | Auto-increment |
 | org_id | uuid | FK -> organizations.id, NOT NULL, indexed | |
-| guest_id | integer | FK -> guests.mazmo_user_id, NOT NULL, indexed | |
+| guest_id | uuid | FK -> guests.id, NOT NULL, indexed | |
 | banned_by_id | integer | FK -> users.id, nullable | |
 | banned_at | timestamptz | NOT NULL | |
 | reason | varchar(500) | NOT NULL | Obligatorio; no puede estar vacio |
@@ -249,11 +253,11 @@ Audit log. Una fila por accion auditable. Las filas nunca se modifican ni elimin
 | timestamp | timestamptz | NOT NULL, indexed | Default: now() |
 | org_id | uuid | FK -> organizations.id, nullable, indexed | NULL solo para GUEST_CREATED |
 | actor_id | integer | FK -> users.id, nullable | El staff que realizo la accion |
-| guest_id | integer | FK -> guests.mazmo_user_id, nullable, indexed | |
+| guest_id | uuid | FK -> guests.id, nullable, indexed | |
 | meetup_id | uuid | FK -> meetups.id, nullable, indexed | |
 | reason | varchar(500) | nullable | Presente para UNDO_CHECK_IN y BAN |
 
-**Valores de EventType:** `CHECK_IN`, `UNDO_CHECK_IN`, `BAN`, `UNBAN`, `MEETUP_FINALIZED`, `MEETUP_UNFINALIZED`, `WALKIN`, `GUEST_CREATED`, `PAYMENT_RECORDED`, `PAYMENT_REVOKED`, `PAYMENT_REQUIREMENT_ENABLED`, `PAYMENT_REQUIREMENT_DISABLED`
+**Valores de EventType:** `CHECK_IN`, `UNDO_CHECK_IN`, `BAN`, `UNBAN`, `MEETUP_FINALIZED`, `MEETUP_UNFINALIZED`, `WALKIN`, `GUEST_CREATED`, `GUEST_MAZMO_LINKED`, `GUEST_MAZMO_UNLINKED`, `PAYMENT_RECORDED`, `PAYMENT_REVOKED`, `PAYMENT_REQUIREMENT_ENABLED`, `PAYMENT_REQUIREMENT_DISABLED`
 
 Cada entrada del audit log se escribe en la misma transaccion de base de datos que la accion que registra. Si la accion se revierte, la entrada del log se revierte con ella.
 
@@ -278,3 +282,4 @@ Cada entrada del audit log se escribe en la misma transaccion de base de datos q
 | 0013 | Remover campos de ban global de guests; migrar bans existentes a organization_bans |
 | 0014 | Campos de recovery_code en users |
 | 0015 | requires_payment en meetups; has_paid/paid_at/paid_by_id en meetup_rsvps (eventos pagos) |
+| 0016 | Guest identity decoupled from Mazmo: guests.id (UUID) as PK, mazmo_user_id/mazmo_handle nullable, instagram_username, guest_id FKs retargeted from mazmo_user_id to id |
