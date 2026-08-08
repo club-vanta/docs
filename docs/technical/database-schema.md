@@ -282,4 +282,4 @@ Cada entrada del audit log se escribe en la misma transaccion de base de datos q
 | 0013 | Remover campos de ban global de guests; migrar bans existentes a organization_bans |
 | 0014 | Campos de recovery_code en users |
 | 0015 | requires_payment en meetups; has_paid/paid_at/paid_by_id en meetup_rsvps (eventos pagos) |
-| 0016 | Guest identity decoupled from Mazmo: guests.id (UUID) as PK, mazmo_user_id/mazmo_handle nullable, instagram_username, guest_id FKs retargeted from mazmo_user_id to id |
+| 0016 | Identidad de guest desacoplada de Mazmo: guests.id (UUID) como PK, mazmo_user_id/mazmo_handle nullable, instagram_username, FKs de guest_id retargeteadas de mazmo_user_id a id |

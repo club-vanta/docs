@@ -44,7 +44,7 @@ Un guest creado sin Mazmo (`mazmo_user_id` y `mazmo_handle` en `None`) puede vin
 Recibe un `username` de Mazmo, lo busca en la API de Mazmo, y sobreescribe `mazmo_user_id`, `mazmo_handle` y `displayname` del guest con los datos del perfil obtenido. `instagram_username` no se toca.
 
 - Devuelve 404 si el guest no existe, o si el username no existe en Mazmo.
-- Devuelve 409 si el guest ya esta vinculado a otra cuenta de Mazmo. Hay que desvincular primero con `PATCH /guests/{id}/unlink-mazmo` si se quiere cambiar el vinculo.
+- Devuelve 409 si el guest ya esta vinculado a una cuenta de Mazmo (sin importar si es la misma cuenta u otra). Hay que desvincular primero con `PATCH /guests/{id}/unlink-mazmo` si se quiere cambiar el vinculo.
 - Devuelve 409 si ese `mazmo_user_id` ya pertenece a otro guest existente en el sistema. **No hay merge automatico de guests**: hay que elegir cual de los dos guests es el correcto, o corregir el username antes de reintentar.
 
 ### Desvincular: `PATCH /guests/{id}/unlink-mazmo`
@@ -81,7 +81,7 @@ Un guest puede ser baneado en cualquier momento de su lifecycle. Ver [Bans](bans
 
 ## Datos inmutables
 
-El unico dato que nunca cambia una vez creado el guest es su `id`. `mazmo_user_id` y `mazmo_handle` no son inmutables: empiezan en `None` si el guest se creo sin Mazmo, se completan al vincular (`link-mazmo`), se vacian al desvincular (`unlink-mazmo`), y pueden volver a completarse con una cuenta distinta en un re-vinculo posterior. Si el usuario cambia su handle en Mazmo mientras esta vinculado, la proxima sync puede actualizar `mazmo_handle`.
+El unico dato que nunca cambia una vez creado el guest es su `id`. `mazmo_user_id` y `mazmo_handle` no son inmutables: empiezan en `None` si el guest se creo sin Mazmo, se completan al vincular (`link-mazmo`), se vacian al desvincular (`unlink-mazmo`), y pueden volver a completarse con una cuenta distinta en un re-vinculo posterior. Una vez vinculado, sin embargo, `mazmo_user_id` y `mazmo_handle` nunca cambian de forma automatica via sync: el upsert de guests del sync es solo de insercion (`ON CONFLICT DO NOTHING`), no actualiza ninguna columna de un guest que ya existe. La unica forma de cambiarlos es desvincular con `unlink-mazmo` y volver a vincular con `link-mazmo`.
 
 La clave primaria de la tabla es `id`, no `mazmo_user_id`. Esto es lo que permite que un guest exista sin Mazmo, y que el ciclo de vincular/desvincular no rompa las referencias desde otras tablas (RSVPs, bans, audit log): esas tablas apuntan al `id` del guest, que es estable sin importar su estado de vinculacion con Mazmo.
 
