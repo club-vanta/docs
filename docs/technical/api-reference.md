@@ -64,10 +64,14 @@ Cualquier usuario aprobado (sin importar la org) puede acceder a los registros d
 
 | Metodo | Path | Rol requerido | Descripcion |
 |--------|------|--------------|-------------|
-| GET | /guests/ | Usuario aprobado | Listar todos los guests conocidos |
-| POST | /guests/ | Usuario aprobado | Registrar un guest por su username de Mazmo; consulta Mazmo para obtener su perfil |
-| GET | /guests/{mazmo_user_id} | Usuario aprobado | Obtener un guest por su mazmo_user_id numerico |
-| GET | /guests/by-username/{username} | Usuario aprobado | Obtener un guest por su username de Mazmo |
+| GET | /guests/ | Usuario aprobado | Listar todos los guests conocidos; admite filtro `?q=` por displayname o mazmo_handle |
+| POST | /guests/mazmo | Usuario aprobado | Registrar un guest por su handle de Mazmo; consulta Mazmo para obtener su perfil |
+| POST | /guests/manual | Usuario aprobado | Registrar un guest sin cuenta de Mazmo (sin chequeo de duplicados, ya que no hay identificador externo) |
+| GET | /guests/{guest_id} | Usuario aprobado | Obtener un guest por su id interno (UUID) |
+| GET | /guests/by-mazmo-handle/{mazmo_handle} | Usuario aprobado | Obtener un guest por su handle de Mazmo |
+| PATCH | /guests/{guest_id}/link-mazmo | Usuario aprobado | Vincular un guest existente (creado sin Mazmo) a una cuenta de Mazmo |
+| PATCH | /guests/{guest_id}/unlink-mazmo | Usuario aprobado | Desvincular la cuenta de Mazmo de un guest; retorna 409 si el guest tiene un ban activo en cualquier organizacion, para evitar que se re-registre limpio (sin ban) via POST /guests/mazmo |
+| PATCH | /guests/{guest_id} | Usuario aprobado | Editar el displayname y/o instagram_username de un guest |
 
 ---
 
@@ -78,8 +82,8 @@ Las operaciones de ban tienen scope de org. Ver la lista de baneados es accesibl
 | Metodo | Path | Rol requerido | Descripcion |
 |--------|------|--------------|-------------|
 | GET | /organizations/{org_id}/guests/banned | Miembro de la org | Listar guests baneados actualmente en esta org |
-| PATCH | /organizations/{org_id}/guests/{mazmo_user_id}/ban | ADMIN de org | Banear un guest en esta org; requiere razon |
-| PATCH | /organizations/{org_id}/guests/{mazmo_user_id}/unban | ADMIN de org | Levantar el ban de un guest en esta org |
+| PATCH | /organizations/{org_id}/guests/{guest_id}/ban | ADMIN de org | Banear un guest en esta org; requiere razon |
+| PATCH | /organizations/{org_id}/guests/{guest_id}/unban | ADMIN de org | Levantar el ban de un guest en esta org |
 
 ---
 
@@ -105,9 +109,9 @@ Todas las operaciones de check-in tienen scope de org y estan disponibles para c
 
 | Metodo | Path | Rol requerido | Descripcion |
 |--------|------|--------------|-------------|
-| POST | /organizations/{org_id}/meetups/{meetup_id}/guests/{mazmo_user_id}/add-walkin | Miembro de la org | Agregar un guest al meetup como walk-in (sin RSVP previo) |
-| POST | /organizations/{org_id}/meetups/{meetup_id}/guests/{mazmo_user_id}/checkin | Miembro de la org | Hacer check-in de un guest; registra hora de llegada, orden, y actor |
-| PATCH | /organizations/{org_id}/meetups/{meetup_id}/guests/{mazmo_user_id}/undo-checkin | Miembro de la org | Deshacer un check-in; requiere razon |
+| POST | /organizations/{org_id}/meetups/{meetup_id}/guests/{guest_id}/add-walkin | Miembro de la org | Agregar un guest al meetup como walk-in (sin RSVP previo) |
+| POST | /organizations/{org_id}/meetups/{meetup_id}/guests/{guest_id}/checkin | Miembro de la org | Hacer check-in de un guest; registra hora de llegada, orden, y actor |
+| PATCH | /organizations/{org_id}/meetups/{meetup_id}/guests/{guest_id}/undo-checkin | Miembro de la org | Deshacer un check-in; requiere razon |
 
 ---
 

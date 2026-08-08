@@ -9,7 +9,9 @@ El sistema registra un log de auditoria de todas las acciones importantes. Esto 
 | `CHECK_IN` | Un staff hizo check-in de un guest en un meetup |
 | `UNDO_CHECK_IN` | Un staff deshizo un check-in (incluye razon) |
 | `WALKIN` | Se agrego un guest como walk-in en un meetup |
-| `GUEST_CREATED` | Se creo un guest manualmente (via busqueda por username) |
+| `GUEST_CREATED` | Se creo un guest, ya sea via busqueda por handle de Mazmo o de forma manual (sin cuenta de Mazmo) |
+| `GUEST_MAZMO_LINKED` | Se vinculo un guest existente (creado sin Mazmo) a una cuenta de Mazmo |
+| `GUEST_MAZMO_UNLINKED` | Se desvinculo la cuenta de Mazmo de un guest |
 | `BAN` | Un admin baneo un guest (incluye razon) |
 | `UNBAN` | Un admin desbaneo un guest |
 | `MEETUP_FINALIZED` | Un admin finalizo un meetup |

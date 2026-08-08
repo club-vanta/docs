@@ -251,7 +251,7 @@ Audit log. Una fila por accion auditable. Las filas nunca se modifican ni elimin
 | id | integer | PK | Auto-increment |
 | event_type | varchar(32) | NOT NULL, indexed | Ver valores de EventType abajo |
 | timestamp | timestamptz | NOT NULL, indexed | Default: now() |
-| org_id | uuid | FK -> organizations.id, nullable, indexed | NULL solo para GUEST_CREATED |
+| org_id | uuid | FK -> organizations.id, nullable, indexed | NULL solo para GUEST_CREATED, GUEST_MAZMO_LINKED, y GUEST_MAZMO_UNLINKED |
 | actor_id | integer | FK -> users.id, nullable | El staff que realizo la accion |
 | guest_id | uuid | FK -> guests.id, nullable, indexed | |
 | meetup_id | uuid | FK -> meetups.id, nullable, indexed | |
