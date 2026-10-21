@@ -19,18 +19,21 @@ Un meetup finalizado no acepta syncs.
 1. Consulta la API de Mazmo con la URL del evento
 2. Obtiene la lista de usuarios que hicieron RSVP (con su `userId` y timestamp de RSVP)
 3. Consulta los perfiles de esos usuarios en Mazmo (en lotes de hasta 30 por request)
-4. Upsert de guests: si el guest no existe en el sistema, lo crea. Si ya existe, no lo modifica.
-5. Upsert de RSVPs: si el RSVP no existe, lo crea. Si ya existe, actualiza el `rsvp_time`.
-6. Marca como cancelados los RSVPs que ya no estan en la lista de Mazmo.
+4. Upsert de guests: si el guest no existe en el sistema, lo crea. Si ya existe y Mazmo reporta un `displayname` distinto, lo actualiza y lo registra en el [historial de nombres](guests.md#historial-de-nombres). No toca ningun otro campo del guest.
+5. Actualiza el [perfil de Mazmo](guests.md#perfil-de-mazmo) (avatar, edad, genero, pronombre, suspendido/baneado) de todos los guests del sync, cambie o no su nombre.
+6. Upsert de RSVPs: si el RSVP no existe, lo crea. Si ya existe, actualiza el `rsvp_time`.
+7. Marca como cancelados los RSVPs que ya no estan en la lista de Mazmo.
 
 ## Lo que el sync NUNCA toca
 
-El sync nunca modifica los datos de check-in:
+El sync nunca modifica los datos de check-in, de pago, ni el tipo de guest:
 
 - `has_arrived`
 - `arrival_time`
 - `arrival_order`
 - `checked_in_by_id`
+- `has_paid`, `paid_at`, `paid_by_id`
+- `guest_type`
 
 Esto es critico: si alguien ya fue chequeado y se hace un nuevo sync, su estado de check-in no cambia.
 
@@ -38,7 +41,7 @@ Esto es critico: si alguien ya fue chequeado y se hace un nuevo sync, su estado 
 
 El sync es seguro de correr multiples veces. El comportamiento es siempre el mismo:
 
-- Guests ya existentes: no se modifican
+- Guests ya existentes: solo cambia su `displayname` si Mazmo reporta otro, y se refresca su perfil de Mazmo
 - RSVPs ya existentes: se actualiza el `rsvp_time`, nada mas
 - Check-in data: intocable
 

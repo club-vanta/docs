@@ -55,6 +55,9 @@ Una vez que el evento arranzo, el flujo en la puerta es:
 - **Check-in normal**: busca al guest en la lista y hace click en "Check In".
 - **Walk-in**: si alguien llega sin RSVP, podes agregarlo manualmente. Ver [Check-in y walk-ins](../business-logic/checkin.md).
 - **Guest baneado**: si un guest esta baneado en tu org, el sistema muestra una advertencia en el momento del check-in.
+- **Cortesias, stands y staff**: en un evento pago, un admin puede marcar a alguien como Cortesia, Stand o Staff desde el menu `...` de su fila. Esas personas pueden entrar sin pagar. Ver [Tipos de guest](../business-logic/guest-types.md).
+- **Perfil del guest**: hace click en el nombre de alguien para ver su foto de Mazmo, sus datos, si esta vanteado y por que, y los nombres que tuvo.
+- **Estadisticas**: arriba de la lista ves cuantos llegaron, cuantos hay de cada tipo, cuantos pagaron, y quienes cancelaron despues de pagar (a esos hay que devolverles la entrada).
 
 ---
 

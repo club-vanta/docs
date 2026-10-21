@@ -12,6 +12,12 @@ El sistema registra un log de auditoria de todas las acciones importantes. Esto 
 | `GUEST_CREATED` | Se creo un guest, ya sea via busqueda por handle de Mazmo o de forma manual (sin cuenta de Mazmo) |
 | `GUEST_MAZMO_LINKED` | Se vinculo un guest existente (creado sin Mazmo) a una cuenta de Mazmo |
 | `GUEST_MAZMO_UNLINKED` | Se desvinculo la cuenta de Mazmo de un guest |
+| `GUEST_DISPLAYNAME_CHANGED` | Cambio el nombre de un guest que ya existia, por sync, edicion manual o `link-mazmo` (incluye nombre anterior y nuevo) |
+| `GUEST_TYPE_CHANGED` | Un admin cambio el [tipo de guest](business-logic/guest-types.md) de un RSVP (incluye tipo anterior y nuevo) |
+| `PAYMENT_RECORDED` | Un admin marco el pago de un guest |
+| `PAYMENT_REVOKED` | Un admin deshizo un pago marcado (incluye razon) |
+| `PAYMENT_REQUIREMENT_ENABLED` | Un admin hizo pago un meetup |
+| `PAYMENT_REQUIREMENT_DISABLED` | Un admin hizo gratis un meetup |
 | `BAN` | Un admin baneo un guest (incluye razon) |
 | `UNBAN` | Un admin desbaneo un guest |
 | `MEETUP_FINALIZED` | Un admin finalizo un meetup |
@@ -24,6 +30,9 @@ Cada evento registra:
 - **Guest** afectado (cuando aplica)
 - **Meetup** donde ocurrio (cuando aplica)
 - **Razon** (para UNDO_CHECK_IN, BAN, etc.)
+
+!!! info "Eventos globales de guests"
+    `GUEST_CREATED`, `GUEST_MAZMO_LINKED`, `GUEST_MAZMO_UNLINKED` y `GUEST_DISPLAYNAME_CHANGED` no pertenecen a ninguna organizacion (su `org_id` es nulo), porque los guests son globales. Los endpoints de audit log son por organizacion, asi que estos eventos no aparecen ahi. Los cambios de nombre se ven en el historial de nombres del perfil del guest.
 
 ## Quien puede ver que
 
@@ -43,7 +52,7 @@ El acceso al audit log depende del rol:
 
 Desde la pantalla de eventos en la app:
 
-- Por tipo: CHECK_IN, UNDO_CHECK_IN, BAN, UNBAN, WALKIN
+- Por tipo: CHECK_IN, UNDO_CHECK_IN, BAN, UNBAN, WALKIN, PAYMENT_RECORDED, PAYMENT_REVOKED, GUEST_TYPE_CHANGED
 - Por rango de fechas
 - Por guest especifico
 - Por meetup especifico

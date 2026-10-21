@@ -44,6 +44,24 @@ erDiagram
         varchar displayname
         varchar instagram_username "nullable"
     }
+    guest_displayname_history {
+        int id PK
+        uuid guest_id FK
+        varchar displayname
+        varchar source
+        int actor_id FK
+        timestamptz recorded_at
+    }
+    guest_mazmo_profile {
+        uuid guest_id PK_FK
+        varchar avatar_url "nullable"
+        int age "nullable"
+        varchar gender "nullable"
+        varchar pronoun "nullable"
+        bool mazmo_suspended
+        bool mazmo_banned
+        timestamptz synced_at
+    }
     meetups {
         uuid id PK
         uuid org_id FK
@@ -67,6 +85,7 @@ erDiagram
         bool has_paid
         timestamptz paid_at
         int paid_by_id FK
+        varchar guest_type
     }
     organization_bans {
         int id PK
@@ -95,6 +114,8 @@ erDiagram
     guests ||--o{ meetup_rsvps : "tiene RSVPs"
     meetups ||--o{ meetup_rsvps : "tiene guests"
     guests ||--o{ organization_bans : "puede estar baneado en"
+    guests ||--o{ guest_displayname_history : "tuvo nombres"
+    guests ||--o| guest_mazmo_profile : "tiene perfil de Mazmo"
     users ||--o{ event_log : "realiza acciones"
     guests ||--o{ event_log : "es sujeto de"
     meetups ||--o{ event_log : "tiene eventos"
@@ -182,6 +203,40 @@ Los bans se almacenan en `organization_bans`, no en esta tabla. No existe campo 
 
 ---
 
+### `guest_displayname_history`
+
+Cada valor que tuvo el `displayname` de un guest. Una fila por valor, incluido el primero; nunca se modifican ni eliminan (salvo en cascada si se borra el guest).
+
+| Columna | Tipo | Constraints | Notas |
+|---------|------|-------------|-------|
+| id | integer | PK | Auto-increment |
+| guest_id | uuid | FK -> guests.id (ON DELETE CASCADE), NOT NULL, indexed | |
+| displayname | varchar | NOT NULL | El valor que tuvo el guest |
+| source | varchar(16) | NOT NULL | SYNC, MANUAL_EDIT, MAZMO_LINK o BACKFILL |
+| actor_id | integer | FK -> users.id (ON DELETE SET NULL), nullable | NULL para SYNC y BACKFILL |
+| recorded_at | timestamptz | NOT NULL, default now() | Para BACKFILL es la fecha de la migracion 0018 |
+
+Indice compuesto en `(guest_id, recorded_at)`: la consulta es siempre "todas las filas de este guest, ordenadas en el tiempo".
+
+---
+
+### `guest_mazmo_profile`
+
+Foto del perfil de Mazmo de un guest vinculado. Relacion 1:1 con `guests`, sin historial: cada sync o `link-mazmo` pisa la fila. Se borra al desvincular el guest de Mazmo.
+
+| Columna | Tipo | Constraints | Notas |
+|---------|------|-------------|-------|
+| guest_id | uuid | PK + FK -> guests.id (ON DELETE CASCADE) | |
+| avatar_url | varchar | nullable | Solo la URL `default` del avatar de Mazmo |
+| age | integer | nullable | |
+| gender | varchar(32) | nullable | Texto libre de Mazmo, truncado a 32 caracteres |
+| pronoun | varchar(32) | nullable | Texto libre de Mazmo, truncado a 32 caracteres |
+| mazmo_suspended | boolean | NOT NULL, default false | Marca de Mazmo, no un ban de la org |
+| mazmo_banned | boolean | NOT NULL, default false | Marca de Mazmo, no un ban de la org |
+| synced_at | timestamptz | NOT NULL, default now() | De cuando es la foto |
+
+---
+
 ### `meetups`
 
 Eventos trackeados por el sistema. Cada meetup pertenece a una org y esta vinculado a una URL de Mazmo.
@@ -217,9 +272,10 @@ Asociacion entre un guest y un meetup, con datos de RSVP y check-in. PK compuest
 | has_paid | boolean | NOT NULL, default false, indexed | Solo relevante si el meetup tiene requires_payment=true |
 | paid_at | timestamptz | nullable | Solo seteado al marcar el pago |
 | paid_by_id | integer | FK -> users.id, nullable | Que admin marco el pago |
+| guest_type | varchar(16) | NOT NULL, default 'NORMAL', indexed | NORMAL, INVITED, VENDOR o STAFF. Solo NORMAL paga en un evento pago |
 
 !!! warning "Campos intocables por el sync"
-    `has_arrived`, `arrival_time`, `arrival_order`, `checked_in_by_id`, `has_paid`, `paid_at`, y `paid_by_id` solo son modificados por los flujos de check-in y de pago. El sync nunca los toca, aunque actualice otros campos del RSVP.
+    `has_arrived`, `arrival_time`, `arrival_order`, `checked_in_by_id`, `has_paid`, `paid_at`, `paid_by_id` y `guest_type` solo son modificados por los flujos de check-in, de pago y de tipo de guest. El sync nunca los toca, aunque actualice otros campos del RSVP.
 
 `arrival_order` es asignado por un **trigger de base de datos** en el momento del check-in -- no es calculado por el codigo de aplicacion. El trigger asigna el siguiente entero disponible dentro del meetup.
 
@@ -251,13 +307,13 @@ Audit log. Una fila por accion auditable. Las filas nunca se modifican ni elimin
 | id | integer | PK | Auto-increment |
 | event_type | varchar(32) | NOT NULL, indexed | Ver valores de EventType abajo |
 | timestamp | timestamptz | NOT NULL, indexed | Default: now() |
-| org_id | uuid | FK -> organizations.id, nullable, indexed | NULL solo para GUEST_CREATED, GUEST_MAZMO_LINKED, y GUEST_MAZMO_UNLINKED |
+| org_id | uuid | FK -> organizations.id, nullable, indexed | NULL solo para GUEST_CREATED, GUEST_MAZMO_LINKED, GUEST_MAZMO_UNLINKED y GUEST_DISPLAYNAME_CHANGED |
 | actor_id | integer | FK -> users.id, nullable | El staff que realizo la accion |
 | guest_id | uuid | FK -> guests.id, nullable, indexed | |
 | meetup_id | uuid | FK -> meetups.id, nullable, indexed | |
 | reason | varchar(500) | nullable | Presente para UNDO_CHECK_IN y BAN |
 
-**Valores de EventType:** `CHECK_IN`, `UNDO_CHECK_IN`, `BAN`, `UNBAN`, `MEETUP_FINALIZED`, `MEETUP_UNFINALIZED`, `WALKIN`, `GUEST_CREATED`, `GUEST_MAZMO_LINKED`, `GUEST_MAZMO_UNLINKED`, `PAYMENT_RECORDED`, `PAYMENT_REVOKED`, `PAYMENT_REQUIREMENT_ENABLED`, `PAYMENT_REQUIREMENT_DISABLED`
+**Valores de EventType:** `CHECK_IN`, `UNDO_CHECK_IN`, `BAN`, `UNBAN`, `MEETUP_FINALIZED`, `MEETUP_UNFINALIZED`, `WALKIN`, `GUEST_CREATED`, `GUEST_MAZMO_LINKED`, `GUEST_MAZMO_UNLINKED`, `PAYMENT_RECORDED`, `PAYMENT_REVOKED`, `PAYMENT_REQUIREMENT_ENABLED`, `PAYMENT_REQUIREMENT_DISABLED`, `GUEST_DISPLAYNAME_CHANGED`, `GUEST_TYPE_CHANGED`
 
 Cada entrada del audit log se escribe en la misma transaccion de base de datos que la accion que registra. Si la accion se revierte, la entrada del log se revierte con ella.
 
@@ -283,3 +339,6 @@ Cada entrada del audit log se escribe en la misma transaccion de base de datos q
 | 0014 | Campos de recovery_code en users |
 | 0015 | requires_payment en meetups; has_paid/paid_at/paid_by_id en meetup_rsvps (eventos pagos) |
 | 0016 | Identidad de guest desacoplada de Mazmo: guests.id (UUID) como PK, mazmo_user_id/mazmo_handle nullable, instagram_username, FKs de guest_id retargeteadas de mazmo_user_id a id |
+| 0017 | guest_type en meetup_rsvps (exencion de pago por tipo de guest) |
+| 0018 | Tabla guest_displayname_history, con backfill BACKFILL de los guests existentes |
+| 0019 | Tabla guest_mazmo_profile |

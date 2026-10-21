@@ -35,3 +35,49 @@ Hay dos momentos en los que el tracker consulta a Mazmo:
 ## Identidad de los guests
 
 La identidad de los guests (su `mazmo_user_id`, `username` y `displayname`) tambien viene de Mazmo. El `mazmo_user_id` es el identificador que Mazmo le asigna a cada cuenta y nunca cambia. Es lo que el tracker usa como clave primaria para reconocer a la misma persona en distintos eventos y syncs. Ver [Guests](guests.md).
+
+## Catalogo de genero y pronombre
+
+Mazmo no devuelve el genero ni el pronombre como texto: devuelve un codigo, y su propio frontend lo traduce. El tracker guarda el codigo crudo en `mazmo_profile.gender` y `mazmo_profile.pronoun`, y el frontend lo traduce con el mapeo de `src/lib/mazmoProfile.ts`. Si llega un codigo que no esta en la tabla, la app muestra el codigo tal cual.
+
+La lista sale del bundle JS de mazmo.net (`GENDERS`, `USERS_PRONOUNS` y las claves `GENDER.*` y `PRONOUN.*` de su diccionario en espanol), relevada el 2026-10-21. Si Mazmo agrega un codigo nuevo, hay que sumarlo aca y en el frontend.
+
+### Genero
+
+| Codigo | Etiqueta en Mazmo | Etiqueta en ingles (tracker) | Pronombre por defecto |
+|---|---|---|---|
+| `MALE` | Hombre | Man | `MALE` |
+| `FEMALE` | Mujer | Woman | `FEMALE` |
+| `MALE_CIS` | Hombre cis | Cis man | `MALE` |
+| `WOMAN_CIS` | Mujer cis | Cis woman | `FEMALE` |
+| `MALE_TRANS` | Hombre trans | Trans man | `MALE` |
+| `FEMALE_TRANS` | Mujer trans | Trans woman | `FEMALE` |
+| `MALE_TRANSGENDER` | Transgénero masculino | Transgender man | `MALE` |
+| `FEMALE_TRANSGENDER` | Transgénero femenina | Transgender woman | `FEMALE` |
+| `TRANS` | Trans | Trans | `NEUTRAL` |
+| `TRANSEXUAL` | Transexual | Transsexual | `NEUTRAL` |
+| `TRANSGENDER` | Transgénero | Transgender | `NEUTRAL` |
+| `TRAVESTI` | Travesti | Travesti | `NEUTRAL` |
+| `CROSSDRESSER` | Crossdresser | Crossdresser | `NEUTRAL` |
+| `INTERSEX` | Intersex | Intersex | `NEUTRAL` |
+| `INTERSEXUAL` | Intersexual | Intersexual | `NEUTRAL` |
+| `ANDROGYNOUS` | Andrógine | Androgynous | `NEUTRAL` |
+| `NOT_BINARY` | No binarie | Non-binary | `NEUTRAL` |
+| `NEUTRAL` | Neutral | Neutral | `NEUTRAL` |
+| `QUEER` | Queer | Queer | `NEUTRAL` |
+| `FLUID` | Género Fluido | Gender fluid | `NEUTRAL` |
+| `UNDEFINED` | Indefinido | Undefined | `NEUTRAL` |
+
+El pronombre por defecto es el que Mazmo le sugiere al usuario segun el genero. El usuario lo puede cambiar, asi que el tracker no lo deduce del genero: usa el campo `pronoun` que manda Mazmo.
+
+### Pronombre
+
+| Codigo | Etiqueta en Mazmo | En la ficha del guest | En el encabezado (es / en) |
+|---|---|---|---|
+| `MALE` | Masculino | Masculino / Masculine | él / he/him |
+| `FEMALE` | Femenino | Femenino / Feminine | ella / she/her |
+| `NEUTRAL` | Neutral | Neutral / Neutral | elle / they/them |
+
+### Valores observados
+
+Para referencia, en los attendees de dos eventos reales (Spookink II y Alter Gatuno Spooky Edition, 137 personas) los generos fueron: `MALE` 63, `FEMALE` 48, `WOMAN_CIS` 9, `NOT_BINARY` 7, `NEUTRAL` 2, `QUEER` 2, `ANDROGYNOUS` 1, `FEMALE_TRANS` 1, `MALE_CIS` 1, `MALE_TRANS` 1, sin dato 2. Los pronombres: `MALE` 64, `FEMALE` 62, `NEUTRAL` 9, sin dato 2. Ambos campos pueden venir en `null`.
