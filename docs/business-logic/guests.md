@@ -85,7 +85,7 @@ Para cada guest vinculado, el sistema guarda una foto del perfil de Mazmo: avata
 
 - Se actualiza en cada sync que incluye al guest, al vincularlo con `link-mazmo`, y al crearlo por username de Mazmo. No guarda historial: cada actualizacion pisa la anterior, y `synced_at` dice de cuando es la foto.
 - `mazmo_profile` es `null` tanto para un guest sin Mazmo como para uno vinculado que todavia no paso por ningun sync.
-- `gender` y `pronoun` son texto libre que controla Mazmo.
+- `gender` y `pronoun` son codigos de Mazmo (`MALE`, `WOMAN_CIS`, `NOT_BINARY`, etc.). El backend los guarda tal cual y la app los traduce al mostrarlos. Ver el [catalogo de genero y pronombre](mazmo.md#catalogo-de-genero-y-pronombre).
 
 !!! warning "Suspendido o baneado en Mazmo no es un ban de la org"
     `mazmo_suspended` y `mazmo_banned` son marcas que pone Mazmo sobre la cuenta. No tienen relacion con los [bans](bans.md) de cada organizacion y no bloquean el check-in. La app los muestra aparte, para que el staff no los confunda con un vanteo.
