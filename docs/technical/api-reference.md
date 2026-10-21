@@ -72,6 +72,7 @@ Cualquier usuario aprobado (sin importar la org) puede acceder a los registros d
 | PATCH | /guests/{guest_id}/link-mazmo | Usuario aprobado | Vincular un guest existente (creado sin Mazmo) a una cuenta de Mazmo |
 | PATCH | /guests/{guest_id}/unlink-mazmo | Usuario aprobado | Desvincular la cuenta de Mazmo de un guest; retorna 409 si el guest tiene un ban activo en cualquier organizacion, para evitar que se re-registre limpio (sin ban) via POST /guests/mazmo |
 | PATCH | /guests/{guest_id} | Usuario aprobado | Editar el displayname y/o instagram_username de un guest |
+| GET | /guests/{guest_id}/displayname-history | Usuario aprobado | Historial completo de nombres del guest, del mas reciente al mas viejo. Ver [Guests](../business-logic/guests.md#historial-de-nombres) |
 
 ---
 
@@ -98,6 +99,7 @@ Todas las operaciones de meetup tienen scope de org. Cualquier miembro puede lee
 | GET | /organizations/{org_id}/meetups/{meetup_id} | Miembro de la org | Ver un meetup |
 | POST | /organizations/{org_id}/meetups/{meetup_id}/sync | Miembro de la org | Sincronizar la lista de RSVPs desde Mazmo |
 | GET | /organizations/{org_id}/meetups/{meetup_id}/guests | Miembro de la org | Listar guests con RSVP y su estado de check-in y ban |
+| GET | /organizations/{org_id}/meetups/{meetup_id}/stats | Miembro de la org | Conteos agrupados de asistencia, cancelaciones, tipos de guest y pagos. Ver [Tipos de guest](../business-logic/guest-types.md#estadisticas-del-meetup) |
 | PATCH | /organizations/{org_id}/meetups/{meetup_id}/finalize | ADMIN de org | Finalizar el meetup; bloquea check-ins y syncs |
 | PATCH | /organizations/{org_id}/meetups/{meetup_id}/unfinalize | ADMIN de org | Des-finalizar el meetup |
 
@@ -105,13 +107,14 @@ Todas las operaciones de meetup tienen scope de org. Cualquier miembro puede lee
 
 ## Check-ins
 
-Todas las operaciones de check-in tienen scope de org y estan disponibles para cualquier miembro.
+Todas las operaciones de check-in tienen scope de org y estan disponibles para cualquier miembro, salvo el cambio de tipo de guest, que es solo para admins de la org.
 
 | Metodo | Path | Rol requerido | Descripcion |
 |--------|------|--------------|-------------|
 | POST | /organizations/{org_id}/meetups/{meetup_id}/guests/{guest_id}/add-walkin | Miembro de la org | Agregar un guest al meetup como walk-in (sin RSVP previo) |
 | POST | /organizations/{org_id}/meetups/{meetup_id}/guests/{guest_id}/checkin | Miembro de la org | Hacer check-in de un guest; registra hora de llegada, orden, y actor |
 | PATCH | /organizations/{org_id}/meetups/{meetup_id}/guests/{guest_id}/undo-checkin | Miembro de la org | Deshacer un check-in; requiere razon |
+| PATCH | /organizations/{org_id}/meetups/{meetup_id}/guests/{guest_id}/type | ADMIN de org | Cambiar el tipo de guest del RSVP (NORMAL, INVITED, VENDOR, STAFF); 409 si el meetup esta finalizado. Ver [Tipos de guest](../business-logic/guest-types.md) |
 
 ---
 

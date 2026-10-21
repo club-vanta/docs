@@ -40,11 +40,13 @@ A diferencia de marcar el pago, deshacerlo **no** esta bloqueado por la finaliza
 
 Si el meetup requiere pago y el guest no fue marcado como pago, el check-in se **bloquea** con un error 409. A diferencia de los bans (que solo muestran una advertencia y el staff puede decidir igual), el pago es un bloqueo real: no hay forma de hacer check-in sin marcar el pago primero.
 
+La unica excepcion es el [tipo de guest](guest-types.md): el bloqueo solo aplica a guests `NORMAL`. Los guests `INVITED`, `VENDOR` y `STAFF` estan exentos y pueden hacer check-in sin pago registrado. Para eximir a alguien, un admin cambia su tipo en vez de marcarlo como pago.
+
 Esto aplica tambien a walk-ins: un guest agregado como walk-in a un evento pago necesita el mismo marcado de pago antes de poder entrar.
 
 ## Lo que el sync nunca toca
 
-Igual que los campos de check-in, el sync desde Mazmo nunca modifica `has_paid`, `paid_at`, ni quien lo marco. El pago es exclusivamente manual.
+Igual que los campos de check-in, el sync desde Mazmo nunca modifica `has_paid`, `paid_at`, ni quien lo marco, y tampoco el `guest_type`. El pago y la exencion son exclusivamente manuales.
 
 ## Cambiar el tipo de evento despues de creado
 
